@@ -57,3 +57,8 @@ ol, ul {
 .button-single {
   display: inline-flex;
 }
+
+.action-button-clicked {
+  height:40px;
+  border:2px #9999FF dashed;
+}

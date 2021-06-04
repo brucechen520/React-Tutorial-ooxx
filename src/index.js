@@ -49,6 +49,7 @@ function Square(props) {
         stepNumber: 0,
         xIsNext: true,
         isActionAsc: true, // true is asc, false is desc
+        actionIndex: -1,
       };
     }
   
@@ -68,14 +69,16 @@ function Square(props) {
           }
         ]),
         stepNumber: history.length,
-        xIsNext: !this.state.xIsNext
+        xIsNext: !this.state.xIsNext,
+        actionIndex: -1,
       });
     }
   
     jumpTo(step) {
       this.setState({
         stepNumber: step,
-        xIsNext: (step % 2) === 0
+        xIsNext: (step % 2) === 0,
+        actionIndex: step,
       });
     }
   
@@ -96,12 +99,13 @@ function Square(props) {
       const moves = this.getNowHistory(history).map((step, move) => {
         const len = history.length
         move = this.state.isActionAsc? move: len - 1 - move
+        const actionClass = this.state.actionIndex === move? 'action-button-clicked': '';
         const desc = step.description ?
           `Go to move #${move} => ${step.description}`:
           'Go to game start';
         return (
           <li key={move}>
-            <button onClick={() => this.jumpTo(move)}>{desc}</button>
+            <button className={actionClass} onClick={() => this.jumpTo(move)}>{desc}</button>
           </li>
         );
       });
