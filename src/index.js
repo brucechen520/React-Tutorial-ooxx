@@ -119,6 +119,8 @@ function Square(props) {
       let status;
       if (winner) {
         status = "Winner: " + winner;
+      } else if(winner === null && history.length === 10) {
+        status = "This game ended in a tie."
       } else {
         status = "Next player: " + (this.state.xIsNext ? "X" : "O");
       }
