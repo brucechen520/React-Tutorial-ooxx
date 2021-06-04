@@ -47,7 +47,8 @@ function Square(props) {
           }
         ],
         stepNumber: 0,
-        xIsNext: true
+        xIsNext: true,
+        isActionAsc: true, // true is asc, false is desc
       };
     }
   
@@ -78,13 +79,24 @@ function Square(props) {
       });
     }
   
+    reverseAction() {
+        this.setState({
+            isActionAsc: !this.state.isActionAsc,
+        });
+    }
+
+    getNowHistory(history) {
+        return this.state.isActionAsc? history: [...history].reverse()
+    }
+
     render() {
       const history = this.state.history;
       const current = history[this.state.stepNumber];
       const winner = calculateWinner(current.squares);
-  
-      const moves = history.map((step, move) => {
-        const desc = move ?
+      const moves = this.getNowHistory(history).map((step, move) => {
+        const len = history.length
+        move = this.state.isActionAsc? move: len - 1 - move
+        const desc = step.description ?
           `Go to move #${move} => ${step.description}`:
           'Go to game start';
         return (
@@ -93,7 +105,13 @@ function Square(props) {
           </li>
         );
       });
-  
+      
+      const ReverseOrder = () => {
+          return (
+            <button onClick={() => this.reverseAction()}>Reverse</button>
+          )
+      }
+      
       let status;
       if (winner) {
         status = "Winner: " + winner;
@@ -110,8 +128,8 @@ function Square(props) {
             />
           </div>
           <div className="game-info">
-            <div>{status}</div>
-            <ol>{moves}</ol>
+            <div className="description">{status}</div><ReverseOrder className="button-single" />
+            <ol style={{ marginTop: '15px'}}>{moves}</ol>
           </div>
         </div>
       );

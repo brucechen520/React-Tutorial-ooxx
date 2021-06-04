@@ -48,3 +48,12 @@ ol, ul {
 .game-info {
   margin-left: 20px;
 }
+
+.description {
+  display: inline-flex;
+  margin-right: 20px;
+}
+
+.button-single {
+  display: inline-flex;
+}
