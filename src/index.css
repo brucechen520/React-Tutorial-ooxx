@@ -62,3 +62,8 @@ ol, ul {
   height:40px;
   border:2px #9999FF dashed;
 }
+
+.winner-word {
+  color: red;
+  font: bold;
+}

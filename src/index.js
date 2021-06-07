@@ -3,8 +3,9 @@ import ReactDOM from "react-dom";
 import "./index.css";
 
 function Square(props) {
+    const wordClass=props.class? "square winner-word": "square";
     return (
-      <button className="square" onClick={props.onClick}>
+      <button className={wordClass} onClick={props.onClick}>
         {props.value}
       </button>
     );
@@ -14,6 +15,7 @@ function Square(props) {
     renderSquare(i) {
       return (
         <Square
+          class={this.props.word[i]}
           value={this.props.squares[i]}
           onClick={() => this.props.onClick(i)}
         />
@@ -50,6 +52,7 @@ function Square(props) {
         xIsNext: true,
         isActionAsc: true, // true is asc, false is desc
         actionIndex: -1,
+        word: Array(9).fill(false)
       };
     }
   
@@ -118,10 +121,16 @@ function Square(props) {
       
       let status;
       if (winner) {
-        status = "Winner: " + winner;
+        let arr = Array(9).fill(false)
+        arr[winner[0]] = true
+        arr[winner[1]] = true
+        arr[winner[2]] = true
+        this.state.word = arr;
+        status = "Winner: " + current.squares[winner[0]];
       } else if(winner === null && history.length === 10) {
         status = "This game ended in a tie."
       } else {
+        this.state.word = Array(9).fill(false)
         status = "Next player: " + (this.state.xIsNext ? "X" : "O");
       }
   
@@ -129,6 +138,7 @@ function Square(props) {
         <div className="game">
           <div className="game-board">
             <Board
+              word={this.state.word}
               squares={current.squares}
               onClick={i => this.handleClick(i)}
             />
@@ -160,7 +170,7 @@ function Square(props) {
     for (let i = 0; i < lines.length; i++) {
       const [a, b, c] = lines[i];
       if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-        return squares[a];
+        return [a, b, c];
       }
     }
     return null;
