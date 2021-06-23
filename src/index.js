@@ -4,7 +4,7 @@ import "./index.css";
 
 function Square(props) {
     return (
-      <button className="square" onClick={props.onClick}>
+      <button className="square" onClick={props.onClick} style={{color:props.isSpot?"red":"black"}}>
         {props.value}
       </button>
     );
@@ -16,6 +16,7 @@ function Square(props) {
         <Square
           value={this.props.squares[i]}
           onClick={() => this.props.onClick(i)}
+          isSpot = {this.props.spots.includes(i)}
         />
       );
     }
@@ -57,16 +58,9 @@ function Square(props) {
       const history = this.state.history.slice(0, this.state.stepNumber + 1);
       const current = history[history.length - 1];
       const squares = current.squares.slice();
-      const winner = calculateWinner(squares);
+      const { winner } = calculateWinner(squares);
       if (winner || squares[i]) {
-        let arr = Array(9).fill(false)
-        arr[winner[0]] = true
-        arr[winner[1]] = true
-        arr[winner[2]] = true
-        this.setState({
-          word: arr,
-        })
-        return;
+        return
       }
       squares[i] = this.state.xIsNext ? "X" : "O";
       this.setState({
@@ -79,7 +73,6 @@ function Square(props) {
         stepNumber: history.length,
         xIsNext: !this.state.xIsNext,
         actionIndex: -1,
-        word: Array(9).fill(false),
       });
     }
   
@@ -100,7 +93,7 @@ function Square(props) {
     render() {
       const history = this.state.history;
       const current = history[this.state.stepNumber];
-      const winner = calculateWinner(current.squares);
+      const { winner, spots } = calculateWinner(current.squares)
       const moves = history.map((step, move) => {
         const actionClass = this.state.stepNumber === move? 'action-button-clicked': '';
         const desc = move === 0 ?
@@ -120,10 +113,10 @@ function Square(props) {
       let status;
       if (winner) {
         status = "Winner: " + winner;
-      } else if(winner === null && history.length === 10) {
-        status = "This game ended in a tie."
-      } else {
+      } else if(spots.length === 0 && this.state.stepNumber < 9) {
         status = "Next player: " + (this.state.xIsNext ? "X" : "O");
+      } else {
+        status = "This game ended in a tie."
       }
   
       return (
@@ -132,6 +125,7 @@ function Square(props) {
             <Board
               squares={current.squares}
               onClick={i => this.handleClick(i)}
+              spots = { spots }
             />
           </div>
           <div className="game-info">
@@ -161,9 +155,14 @@ function Square(props) {
     for (let i = 0; i < lines.length; i++) {
       const [a, b, c] = lines[i];
       if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-        return squares[a];
+        return {
+          winner: squares[a],
+          spots: [a, b, c]
+        }
       }
     }
-    return null;
+    return {
+      spots: []
+    };
   }
   
