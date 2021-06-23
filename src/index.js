@@ -60,7 +60,15 @@ function Square(props) {
       const history = this.state.history.slice(0, this.state.stepNumber + 1);
       const current = history[history.length - 1];
       const squares = current.squares.slice();
-      if (calculateWinner(squares) || squares[i]) {
+      const winner = calculateWinner(squares);
+      if (winner || squares[i]) {
+        let arr = Array(9).fill(false)
+        arr[winner[0]] = true
+        arr[winner[1]] = true
+        arr[winner[2]] = true
+        this.setState({
+          word: arr,
+        })
         return;
       }
       squares[i] = this.state.xIsNext ? "X" : "O";
@@ -74,6 +82,7 @@ function Square(props) {
         stepNumber: history.length,
         xIsNext: !this.state.xIsNext,
         actionIndex: -1,
+        word: Array(9).fill(false),
       });
     }
   
@@ -91,21 +100,15 @@ function Square(props) {
         });
     }
 
-    getNowHistory(history) {
-        return this.state.isActionAsc? history: [...history].reverse()
-    }
-
     render() {
       const history = this.state.history;
       const current = history[this.state.stepNumber];
       const winner = calculateWinner(current.squares);
-      const moves = this.getNowHistory(history).map((step, move) => {
-        const len = history.length
-        move = this.state.isActionAsc? move: len - 1 - move
-        const actionClass = this.state.actionIndex === move? 'action-button-clicked': '';
-        const desc = step.description ?
-          `Go to move #${move} => ${step.description}`:
-          'Go to game start';
+      const moves = history.map((step, move) => {
+        const actionClass = this.state.stepNumber === move? 'action-button-clicked': '';
+        const desc = move === 0 ?
+        'Go to game start': 
+        `Go to move #${move} => ${step.description}`;
         return (
           <li key={move}>
             <button className={actionClass} onClick={() => this.jumpTo(move)}>{desc}</button>
@@ -113,24 +116,16 @@ function Square(props) {
         );
       });
       
-      const ReverseOrder = () => {
-          return (
-            <button onClick={() => this.reverseAction()}>Reverse</button>
-          )
+      if (!this.state.isActionAsc) {
+        moves.reverse()
       }
-      
+
       let status;
       if (winner) {
-        let arr = Array(9).fill(false)
-        arr[winner[0]] = true
-        arr[winner[1]] = true
-        arr[winner[2]] = true
-        this.state.word = arr;
         status = "Winner: " + current.squares[winner[0]];
       } else if(winner === null && history.length === 10) {
         status = "This game ended in a tie."
       } else {
-        this.state.word = Array(9).fill(false)
         status = "Next player: " + (this.state.xIsNext ? "X" : "O");
       }
   
@@ -144,7 +139,7 @@ function Square(props) {
             />
           </div>
           <div className="game-info">
-            <div className="description">{status}</div><ReverseOrder className="button-single" />
+            <div className="description">{status}</div><button className="button-single" onClick={() => this.reverseAction()}>Reverse</button>
             <ol style={{ marginTop: '15px'}}>{moves}</ol>
           </div>
         </div>
